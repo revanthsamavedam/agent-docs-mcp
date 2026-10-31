@@ -29,6 +29,10 @@ EXPECTED_TOOLS = {
     "list_versions",
     "get_version",
     "get_version_html",
+    "get_document_state",
+    "set_document_state",
+    "patch_document_state",
+    "delete_document_state",
 }
 
 
@@ -36,8 +40,8 @@ def test_tool_list_is_exactly_the_locked_set():
     tools = asyncio.run(mcp.list_tools())
     names = {t.name for t in tools}
     assert names == EXPECTED_TOOLS, names
-    # No comment/state/grant/approval tools may creep in.
-    assert not (names & {"create_comment", "list_comments", "set_state", "grant", "approve"})
+    # No comment/grant/approval tools may creep in.
+    assert not (names & {"create_comment", "list_comments", "grant", "approve"})
 
 
 def _api_reachable() -> bool:

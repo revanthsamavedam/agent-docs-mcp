@@ -4,9 +4,9 @@ Python MCP server for agent-docs, for GitHub Copilot integration.
 Separate repo — it talks to the api repo over HTTP and never
 imports its code or database.
 
-## Scope — publish, view, and version history only
+## Scope — publish, view, version history, and shared state
 
-Tools (exactly these seven — the locked list names seven, not six):
+Tools (eleven):
 
 - `list_documents`
 - `get_document`
@@ -15,9 +15,15 @@ Tools (exactly these seven — the locked list names seven, not six):
 - `list_versions`
 - `get_version`
 - `get_version_html`
+- `get_document_state` — all shared state for a document
+- `set_document_state` — set one key (null deletes it)
+- `patch_document_state` — patch several keys at once
+- `delete_document_state` — delete one key
 
-No comment, state, grant, or approval tools. Documents are plain
-HTML; the MCP server never writes React/JSX into a document.
+Shared state is document-scoped, not version-scoped, and
+changing it never creates a version. No comment, grant, or
+approval tools. Documents are plain HTML; the MCP server never
+writes React/JSX into a document.
 
 ## Configuration
 
