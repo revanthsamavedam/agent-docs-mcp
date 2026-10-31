@@ -1,12 +1,14 @@
 """agent-docs MCP server for GitHub Copilot integration.
 
-Tools only (publish, view, version history):
+Tools (publish, view, version history, shared state):
   list_documents, get_document, create_document, publish_document,
-  list_versions, get_version, get_version_html
+  list_versions, get_version, get_version_html,
+  get_document_state, set_document_state, patch_document_state,
+  delete_document_state
 
-Note on count: the locked tool list names seven tools, not six.
-This server exposes exactly those seven, and nothing else — no
-comment, state, grant, or approval tools.
+State tools call the API's document-scoped KV store: state
+survives across versions and changing it never creates a
+version. No comment, grant, or approval tools.
 
 The tools call the agent-docs API over HTTP. They never import
 code from the api repo and never touch its database. API base URL
@@ -55,6 +57,20 @@ def _get(path: str):
 def _post(path: str, payload: dict):
     with httpx.Client(base_url=api_base_url(), headers=_headers(), timeout=30, trust_env=False) as c:
         r = c.post(path, json=payload)
+        r.raise_for_status()
+        return r.json()
+
+
+def _put(path: str, payload: dict):
+    with httpx.Client(base_url=api_base_url(), headers=_headers(), timeout=30, trust_env=False) as c:
+        r = c.put(path, json=payload)
+        r.raise_for_status()
+        return r.json()
+
+
+def _delete(path: str):
+    with httpx.Client(base_url=api_base_url(), headers=_headers(), timeout=30, trust_env=False) as c:
+        r = c.delete(path)
         r.raise_for_status()
         return r.json()
 
@@ -119,6 +135,30 @@ def get_version(document_id: str, version_id: str) -> dict:
 def get_version_html(document_id: str, version_id: str) -> str:
     """Get one version's raw HTML, byte-identical to what was published."""
     return _get_text(f"/v1/documents/{document_id}/versions/{version_id}/html")
+
+
+@mcp.tool()
+def get_document_state(document_id: str) -> dict:
+    """Get a document's shared state (all keys). State is document-scoped, not version-scoped."""
+    return _get(f"/v1/documents/{document_id}/state")
+
+
+@mcp.tool()
+def set_document_state(document_id: str, key: str, value) -> dict:
+    """Set one shared-state key. A null value deletes the key."""
+    return _put(f"/v1/documents/{document_id}/state/{key}", {"value": value})
+
+
+@mcp.tool()
+def patch_document_state(document_id: str, patch: dict) -> dict:
+    """Patch several shared-state keys at once; null values delete those keys."""
+    return _post(f"/v1/documents/{document_id}/state", {"patch": patch})
+
+
+@mcp.tool()
+def delete_document_state(document_id: str, key: str) -> dict:
+    """Delete one shared-state key."""
+    return _delete(f"/v1/documents/{document_id}/state/{key}")
 
 
 def main() -> None:
