@@ -6,7 +6,7 @@ imports its code or database.
 
 ## Scope — publish, view, version history, and shared state
 
-Tools (sixteen):
+Tools (seventeen):
 
 - `list_documents`
 - `get_document`
@@ -31,6 +31,10 @@ document at view time; stores URLs only, never tokens):
 - `sync_apis_from_swagger` — fetch the latest Swagger doc for an
   app and update its registry entry; with `swagger_url` that URL
   is stored in the app config, without it the stored URL is used
+- `get_copilot_instructions` — return the bundled Copilot
+  instructions text on demand. Writes nothing, fetches nothing
+  remote: the text ships with this package. Copilot can call it
+  at the start of a session instead of relying on a copied file.
 
 No comment, grant, or approval tools. Documents are plain
 HTML; the MCP server never writes React/JSX into a document.
@@ -89,6 +93,11 @@ HTML, live data only via `window.agentdocs.apiFetch`, never a
 token in published HTML, publish with `base_version_id` and
 handle a 409 by re-fetching, and navigation via the viewer nav
 bar or `window.agentdocs.navigate`.
+
+Or, without any file copy, Copilot can call the
+`get_copilot_instructions` MCP tool at the start of a session
+and follow the returned text for that session. That is the
+on-demand route: no CLI fetch, no remote fetch, no file write.
 
 ## GitHub Copilot — HTTP (remote)
 

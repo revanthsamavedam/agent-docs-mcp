@@ -5,7 +5,16 @@ Tools (publish, view, version history, shared state, API registry):
   list_versions, get_version, get_version_html,
   get_document_state, set_document_state, patch_document_state,
   delete_document_state,
-  register_api, list_apis, get_api, delete_api
+  register_api, list_apis, get_api, delete_api,
+  get_copilot_instructions
+
+get_copilot_instructions returns the bundled Copilot instructions
+text on demand. It writes nothing and fetches nothing remote: the
+text ships with this package (agent_docs_mcp/copilot_instructions.md,
+mirrored from docs/copilot-instructions.md), so Copilot gets the
+current rules without a CLI fetch or a .github file. Copying that
+text to .github/copilot-instructions.md in a project is still the
+way to make VS Code apply it automatically.
 
 State tools call the API's document-scoped KV store: state
 survives across versions and changing it never creates a
@@ -26,11 +35,27 @@ from __future__ import annotations
 
 import argparse
 import os
+from pathlib import Path
 
 import httpx
 from mcp.server.mcpserver import MCPServer
 
 mcp = MCPServer("agent-docs")
+
+
+def _instructions_text() -> tuple[str, str]:
+    """Bundled instructions text, and where it came from.
+
+    Bundled copy first (works from a pip install), repo docs copy
+    second (works from a source checkout). No remote fetch, ever.
+    """
+    bundled = Path(__file__).parent / "copilot_instructions.md"
+    if bundled.is_file():
+        return bundled.read_text(encoding="utf-8"), "bundled"
+    docs = Path(__file__).parent.parent / "docs" / "copilot-instructions.md"
+    if docs.is_file():
+        return docs.read_text(encoding="utf-8"), "docs"
+    raise FileNotFoundError("copilot instructions not found in package or docs")
 
 
 def api_base_url() -> str:
@@ -190,6 +215,25 @@ def sync_apis_from_swagger(app: str, swagger_url: str = "") -> dict:
     token URL is kept. Removed endpoints are reported, never auto-deleted.
     """
     return _post(f"/v1/apis/{app}/sync", {"swagger_url": swagger_url} if swagger_url else {})
+
+
+@mcp.tool()
+def get_copilot_instructions() -> dict:
+    """Return the agent-docs rules Copilot should follow when building pages.
+
+    On-demand, local, bundled text — no file is written and nothing
+    is fetched remotely. Follow these rules for every agent-docs page:
+    plain self-contained HTML, live data only via window.agentdocs.apiFetch,
+    never a token in published HTML, publish with base_version_id and
+    handle a 409 by re-fetching. For automatic application in VS Code,
+    copy this text to .github/copilot-instructions.md in the project.
+    """
+    text, source = _instructions_text()
+    return {
+        "instructions": text,
+        "source": source,
+        "apply_automatically": ".github/copilot-instructions.md",
+    }
 
 
 @mcp.tool()

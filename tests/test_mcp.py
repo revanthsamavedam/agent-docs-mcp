@@ -13,6 +13,7 @@ import pytest
 
 from agent_docs_mcp.server import (
     create_document,
+    get_copilot_instructions,
     get_document,
     get_version_html,
     list_documents,
@@ -38,7 +39,22 @@ EXPECTED_TOOLS = {
     "get_api",
     "delete_api",
     "sync_apis_from_swagger",
+    "get_copilot_instructions",
 }
+
+
+def test_get_copilot_instructions_returns_bundled_text():
+    result = get_copilot_instructions()
+    text = result["instructions"]
+    assert "window.agentdocs.apiFetch" in text
+    assert "base_version_id" in text
+    assert "never a token" in text.lower() or "NEVER put a token" in text
+    # Bundled copy must match the docs source, or they drift.
+    from pathlib import Path
+
+    docs = Path(__file__).parent.parent / "docs" / "copilot-instructions.md"
+    if docs.is_file():
+        assert text == docs.read_text(encoding="utf-8")
 
 
 def test_tool_list_is_exactly_the_locked_set():
