@@ -32,6 +32,20 @@ still keeps tokens out of documents (see "Live data" below).
 6. Report back the document title, document id, and version number.
    Never report a publish as done before the tool call succeeds.
 
+## Publish-time validation — the API enforces what this file asks
+
+Instructions alone are not enforcement. The API validates every
+publish (create and new version, MCP and CLI alike) before
+anything is stored, and rejects with 400 `html_validation_failed`
+plus specific violation codes: `secret_detected`, `token_url_in_html`,
+`direct_fetch`, `external_resource`, `react_import`. A rejected
+publish stores nothing and changes no version history. When a
+publish is rejected, fix the exact violation named — remove the
+secret or token URL, replace a direct fetch with `apiFetch`,
+inline an external resource — and publish again. Never work
+around a rejection by publishing through another route; every
+route runs the same validation.
+
 ## Live data — the most important rule
 
 - A document MUST load live data only through the viewer bridge:
