@@ -11,7 +11,8 @@ still keeps tokens out of documents (see "Live data" below).
   is viewer chrome only. A document is ONE self-contained HTML file.
 - Documents are plain HTML + CSS + JavaScript. Never put React, JSX,
   or a framework build step inside a document. Inline CSS and JS, or
-  inline SVG / Mermaid, are fine. One document is capped at 10 MiB.
+  inline SVG / Mermaid, are fine. There is no size cap on a
+  document in agent-docs: HTML is stored as-is, however large.
 - The viewer renders a document in a sandboxed iframe
   (`sandbox="allow-scripts"`, no `allow-same-origin`). Document code
   cannot reach the viewer's origin, cookies, or storage.
