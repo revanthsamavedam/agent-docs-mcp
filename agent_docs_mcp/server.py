@@ -1,6 +1,6 @@
 """agent-docs MCP server for GitHub Copilot integration.
 
-Tools (publish, view, version history, shared state, API registry):
+Tools (publish, view, version history, shared state, API registry, drafts):
   list_documents, get_document, create_document, publish_document,
   list_versions, get_version, get_version_html,
   get_document_state, set_document_state, patch_document_state,
@@ -143,6 +143,30 @@ def publish_document(
             "change_summary": change_summary,
         },
     )
+
+
+@mcp.tool()
+def create_draft_document(title: str, html: str) -> dict:
+    """Create a draft-only document: no version yet. View it on the
+    actual viewer link (?doc=<id>&draft=1), then publish_draft when
+    it looks right. A draft is validated like a publish, but a
+    rejected draft stores nothing."""
+    return _post("/v1/documents", {"title": title, "html": html, "draft": True})
+
+
+@mcp.tool()
+def save_draft(document_id: str, html: str) -> dict:
+    """Save an unpublished draft for an existing document. Creates
+    no version and touches no published version; view it at
+    ?doc=<id>&draft=1 on the actual viewer link."""
+    return _put(f"/v1/documents/{document_id}/draft", {"html": html})
+
+
+@mcp.tool()
+def publish_draft(document_id: str, change_summary: str = "") -> dict:
+    """Publish the stored draft as the next version; clears it.
+    Fails when there is no draft."""
+    return _post(f"/v1/documents/{document_id}/draft/publish", {"change_summary": change_summary})
 
 
 @mcp.tool()

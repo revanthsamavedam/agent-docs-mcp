@@ -6,7 +6,7 @@ imports its code or database.
 
 ## Scope — publish, view, version history, and shared state
 
-Tools (seventeen):
+Tools (twenty):
 
 - `list_documents`
 - `get_document`
@@ -35,6 +35,10 @@ document at view time; stores URLs only, never tokens):
   instructions text on demand. Writes nothing, fetches nothing
   remote: the text ships with this package. Copilot can call it
   at the start of a session instead of relying on a copied file.
+- `create_draft_document`, `save_draft`, `publish_draft` —
+  drafts: an unpublished snapshot viewable on the actual viewer
+  link (`?doc=<id>&draft=1`) with the full bridge, published
+  with one call when it looks right. A draft is never a version.
 
 No comment, grant, or approval tools. Documents are plain
 HTML; the MCP server never writes React/JSX into a document.

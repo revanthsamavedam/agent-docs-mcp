@@ -40,6 +40,9 @@ EXPECTED_TOOLS = {
     "delete_api",
     "sync_apis_from_swagger",
     "get_copilot_instructions",
+    "create_draft_document",
+    "save_draft",
+    "publish_draft",
 }
 
 
