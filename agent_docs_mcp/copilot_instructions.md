@@ -24,8 +24,14 @@ still keeps tokens out of documents (see "Live data" below).
    it (`sync_apis_from_swagger`) before building anything.
 2. `list_documents` to check whether the page already exists.
 3. Build the HTML file locally.
-4. New page: `create_document` (title + HTML). Existing page:
-   `publish_document` with the latest version as `base_version_id`.
+4. Test it as a draft before publishing: new page,
+   `create_draft_document` (title + HTML); existing page,
+   `save_draft`. A draft creates no version — view it on the
+   actual viewer link (`?doc=<id>&draft=1`) with live data,
+   state, and navigation working, share that link for review,
+   and only then `publish_draft`. Direct publish with
+   `create_document` / `publish_document` (latest version as
+   `base_version_id`) is for when the page is already known good.
 5. On a 409 `version_conflict`, do NOT retry the same publish.
    Re-fetch the document, take its current version id as the new base,
    and publish again.
