@@ -1,10 +1,11 @@
 """agent-docs MCP server for GitHub Copilot integration.
 
-Tools (publish, view, version history, shared state):
+Tools (publish, view, version history, shared state, API registry):
   list_documents, get_document, create_document, publish_document,
   list_versions, get_version, get_version_html,
   get_document_state, set_document_state, patch_document_state,
-  delete_document_state
+  delete_document_state,
+  register_api, list_apis, get_api, delete_api
 
 State tools call the API's document-scoped KV store: state
 survives across versions and changing it never creates a
@@ -159,6 +160,30 @@ def patch_document_state(document_id: str, patch: dict) -> dict:
 def delete_document_state(document_id: str, key: str) -> dict:
     """Delete one shared-state key."""
     return _delete(f"/v1/documents/{document_id}/state/{key}")
+
+
+@mcp.tool()
+def register_api(name: str, api_url: str, token_url: str, scope: str = "") -> dict:
+    """Register an internal API for documents to use at view time: name, base URL, and its per-endpoint token URL. Stores URLs only, never tokens."""
+    return _post("/v1/apis", {"name": name, "api_url": api_url, "token_url": token_url, "scope": scope})
+
+
+@mcp.tool()
+def list_apis() -> dict:
+    """List registered internal APIs."""
+    return _get("/v1/apis")
+
+
+@mcp.tool()
+def get_api(name: str) -> dict:
+    """Get one registered internal API."""
+    return _get(f"/v1/apis/{name}")
+
+
+@mcp.tool()
+def delete_api(name: str) -> dict:
+    """Remove a registered internal API."""
+    return _delete(f"/v1/apis/{name}")
 
 
 def main() -> None:

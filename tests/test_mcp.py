@@ -33,6 +33,10 @@ EXPECTED_TOOLS = {
     "set_document_state",
     "patch_document_state",
     "delete_document_state",
+    "register_api",
+    "list_apis",
+    "get_api",
+    "delete_api",
 }
 
 

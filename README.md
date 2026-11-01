@@ -6,7 +6,7 @@ imports its code or database.
 
 ## Scope — publish, view, version history, and shared state
 
-Tools (eleven):
+Tools (fifteen):
 
 - `list_documents`
 - `get_document`
@@ -21,9 +21,16 @@ Tools (eleven):
 - `delete_document_state` — delete one key
 
 Shared state is document-scoped, not version-scoped, and
-changing it never creates a version. No comment, grant, or
-approval tools. Documents are plain HTML; the MCP server never
-writes React/JSX into a document.
+changing it never creates a version.
+
+API registry (onboard an internal API once, use it in any
+document at view time; stores URLs only, never tokens):
+
+- `register_api` — register `{name, api_url, token_url, scope?}`
+- `list_apis`, `get_api`, `delete_api`
+
+No comment, grant, or approval tools. Documents are plain
+HTML; the MCP server never writes React/JSX into a document.
 
 ## Configuration
 
