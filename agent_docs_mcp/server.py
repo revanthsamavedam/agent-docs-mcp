@@ -163,15 +163,33 @@ def delete_document_state(document_id: str, key: str) -> dict:
 
 
 @mcp.tool()
-def register_api(name: str, api_url: str, token_url: str, scope: str = "") -> dict:
-    """Register an internal API for documents to use at view time: name, base URL, and its per-endpoint token URL. Stores URLs only, never tokens."""
-    return _post("/v1/apis", {"name": name, "api_url": api_url, "token_url": token_url, "scope": scope})
+def register_api(name: str, api_url: str, token_url: str, scope: str = "", app: str = "", swagger_url: str = "") -> dict:
+    """Register an internal API for documents to use at view time: app short name, base URL, per-endpoint token URL, and optional Swagger doc URL stored in its app config. Stores URLs only, never tokens."""
+    payload = {"name": name, "api_url": api_url, "token_url": token_url, "scope": scope}
+    if app:
+        payload["app"] = app
+    if swagger_url:
+        payload["swagger_url"] = swagger_url
+    return _post("/v1/apis", payload)
 
 
 @mcp.tool()
-def list_apis() -> dict:
-    """List registered internal APIs."""
-    return _get("/v1/apis")
+def list_apis(app: str = "") -> dict:
+    """List registered internal APIs, optionally for one app."""
+    return _get(f"/v1/apis?app={app}" if app else "/v1/apis")
+
+
+@mcp.tool()
+def sync_apis_from_swagger(app: str, swagger_url: str = "") -> dict:
+    """Fetch the latest Swagger doc for an app and update its registry entry.
+
+    With swagger_url, that URL is stored in the app config; without
+    it, the stored swagger_url is used, so a later sync needs no URL.
+    Base URL comes from servers[0].url, endpoints from paths, token
+    URL from the Swagger oauth2 tokenUrl if present else the existing
+    token URL is kept. Removed endpoints are reported, never auto-deleted.
+    """
+    return _post(f"/v1/apis/{app}/sync", {"swagger_url": swagger_url} if swagger_url else {})
 
 
 @mcp.tool()

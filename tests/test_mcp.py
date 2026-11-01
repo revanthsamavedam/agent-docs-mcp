@@ -37,6 +37,7 @@ EXPECTED_TOOLS = {
     "list_apis",
     "get_api",
     "delete_api",
+    "sync_apis_from_swagger",
 }
 
 

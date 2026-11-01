@@ -6,7 +6,7 @@ imports its code or database.
 
 ## Scope — publish, view, version history, and shared state
 
-Tools (fifteen):
+Tools (sixteen):
 
 - `list_documents`
 - `get_document`
@@ -26,8 +26,11 @@ changing it never creates a version.
 API registry (onboard an internal API once, use it in any
 document at view time; stores URLs only, never tokens):
 
-- `register_api` — register `{name, api_url, token_url, scope?}`
+- `register_api` — register `{name, api_url, token_url, scope?, app?, swagger_url?}`
 - `list_apis`, `get_api`, `delete_api`
+- `sync_apis_from_swagger` — fetch the latest Swagger doc for an
+  app and update its registry entry; with `swagger_url` that URL
+  is stored in the app config, without it the stored URL is used
 
 No comment, grant, or approval tools. Documents are plain
 HTML; the MCP server never writes React/JSX into a document.
