@@ -78,6 +78,18 @@ In VS Code's `mcp.json`:
 Run the api repo first (`python -m app.main` in that repo), then
 ask Copilot to list, create, or publish an agent-docs document.
 
+## Copilot instructions
+
+Copy `docs/copilot-instructions.md` from this repo to
+`.github/copilot-instructions.md` in the project where Copilot
+builds agent-docs pages. VS Code Copilot reads that file
+automatically, so Copilot follows the agent-docs rules without
+being told them every time: documents are plain self-contained
+HTML, live data only via `window.agentdocs.apiFetch`, never a
+token in published HTML, publish with `base_version_id` and
+handle a 409 by re-fetching, and navigation via the viewer nav
+bar or `window.agentdocs.navigate`.
+
 ## GitHub Copilot — HTTP (remote)
 
 Run the server with `--transport streamable-http`, then point
