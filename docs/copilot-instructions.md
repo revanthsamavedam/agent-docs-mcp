@@ -86,7 +86,11 @@ route runs the same validation.
 - A 403 on one section must NOT kill the whole page. Fetch sections
   independently (e.g. `Promise.allSettled`), render each section on
   its own, and show a plain message ("No access to this section")
-  where a call failed. A 401 is retried once by the bridge.
+  where a call failed. A 401 is retried once by the bridge for
+  GET/PUT/DELETE only — never automatically for a POST.
+- `apiFetch` methods are for the business API being displayed,
+  never for publishing to agent-docs itself: publishing is via
+  the MCP tools above, not via a POST from document code.
 - Bake data into the HTML only if the user explicitly asks for a
   snapshot. Otherwise the page is live-at-view: it shows current data
   every time it is opened, and version history is template history,
