@@ -61,6 +61,22 @@ route runs the same validation.
   // res is { status, data } — never a token, never a raw response object.
   ```
 
+- `apiFetch` supports GET (default), POST, PUT, and DELETE:
+
+  ```js
+  // Filters, sorting, and paging ride in the URL for GETs:
+  await window.agentdocs.apiFetch("refdp", "/reports?status=open&sort=due");
+  // A body goes in options for POST/PUT/DELETE (never for GET):
+  await window.agentdocs.apiFetch("refdp", "/reports", { method: "POST", body: { status: "open" } });
+  await window.agentdocs.apiFetch("refdp", "/reports/123", { method: "DELETE" });
+  ```
+
+  The viewer chrome adds the token and owns the call; the
+  document never sets Authorization and never sees a token.
+  A 401 is retried once for GET/PUT/DELETE only — a POST is
+  never auto-retried, so a document that gets a 401 on a POST
+  must not blindly retry it (it could duplicate a creation).
+
 - Never `fetch()` a source API directly from document code. The
   document runs in a sandboxed iframe and has no credentials.
 - NEVER put a token, token URL, API key, secret, or credential in
