@@ -143,5 +143,5 @@ Do not promise or invent: comments, reactions, mentions,
 notifications, sharing/grants UI, approvals UI, real-time co-editing,
 search, or live presence. If the user asks for one of those, say it is
 out of scope and ask what they want instead. Do not build auth: Entra
-OBO / hantweb wiring belongs to the maintainer, and the viewer token
+OBO wiring belongs to the maintainer, and the viewer token
 plumbing is a placeholder until they wire it.
